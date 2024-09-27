@@ -70,7 +70,6 @@ class VdvGeoJsonConverter:
                     os.remove(os.path.join(input_directory, file))
 
     def _add_linestring_feature(self, coordinates, properties):
-
         if self._config['config']['flatten_shapes']:
             num_coordinates = len(coordinates)
             logging.info(f"compressing shape of {num_coordinates} points ...")

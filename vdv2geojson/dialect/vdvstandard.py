@@ -14,6 +14,7 @@ def convert(converter_context, input_directory, output_directory):
         identifier = (record['ONR_TYP_NR'], record['ORT_NR'])
         idx_point_data[identifier] = (
             record['ORT_REF_ORT_NAME'],
+            record['HST_NR_INTERNATIONAL'],
             _convert_coordinate_vdv(record['ORT_POS_LAENGE']),
             _convert_coordinate_vdv(record['ORT_POS_BREITE'])
         )
@@ -74,6 +75,19 @@ def convert(converter_context, input_directory, output_directory):
             last_stop_point_identifier = (lid_verlauf_items[0]['ONR_TYP_NR'], lid_verlauf_items[0]['ORT_NR'])
             last_stop_point = idx_point_data[last_stop_point_identifier]
 
+            shape_distance = 0.0
+
+            # add first stop to intermediate stop meta data
+            intermediate_stop_id = lid_verlauf_items[0]['ORT_NR']
+            if converter_context._config['config']['prefer_international_ids'] and not last_stop_point[1] == '':
+                intermediate_stop_id = last_stop_point[1]
+
+            route_intermediate_stops_meta.append((
+                intermediate_stop_id,
+                shape_distance
+            ))
+
+            # run over remaining items
             for lid_verlauf_item in lid_verlauf_items[1:]:
                 stop_point_identifier = (lid_verlauf_item['ONR_TYP_NR'], lid_verlauf_item['ORT_NR'])
                 stop_point = idx_point_data[stop_point_identifier]
@@ -88,21 +102,27 @@ def convert(converter_context, input_directory, output_directory):
                     intermediate_point = idx_point_data[intermediate_point_reference]
 
                     section_intermediate_point_coordinates.append([
-                        intermediate_point[1],
-                        intermediate_point[2]
+                        intermediate_point[2],
+                        intermediate_point[3]
                     ])
                 
                 route_coordinates = route_coordinates + section_intermediate_point_coordinates
 
                 # generate meta data
+                intermediate_stop_id = lid_verlauf_item['ORT_NR']
+                if converter_context._config['config']['prefer_international_ids'] and not stop_point[1] == '':
+                    intermediate_stop_id = stop_point[1]
+
                 route_intermediate_stops_meta.append((
-                    lid_verlauf_item['ORT_NR'],
-                    section[0]
+                    intermediate_stop_id,
+                    (shape_distance / 1000.0)
                 ))
 
                 # set last_stop_point in order to process next section
                 last_stop_point_identifier = stop_point_identifier
                 last_stop_point = stop_point
+
+                shape_distance = shape_distance + section[0]
 
             # add GeoJSON feature
             converter_context._add_linestring_feature(route_coordinates, {
