@@ -27,7 +27,7 @@ class VdvGeoJsonConverter:
         self._geojson_linestring_features = list()
         self._geojson_files = list()
 
-    def convert(self, input, output):
+    def convert(self, input, output, line_filter):
         
         if input.endswith('.zip'):
             input_directory = os.path.dirname(input)
@@ -47,7 +47,7 @@ class VdvGeoJsonConverter:
 
         if self._dialect == 'vdvstandard':
             from vdv2geojson.dialect import vdvstandard
-            vdvstandard.convert(self, input_directory, output_directory)
+            vdvstandard.convert(self, input_directory, output_directory, line_filter)
         else:
             logging.error(f"unknown dialect {self._dialect}")
 

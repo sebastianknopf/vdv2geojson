@@ -3,7 +3,7 @@ import os
 
 from vdv2geojson.x10 import read_x10_file
 
-def convert(converter_context, input_directory, output_directory):
+def convert(converter_context, input_directory, output_directory, line_filter):
     # load general data
     logging.info('loading REC_ORT.x10 ...')
     x10_REC_ORT = read_x10_file(os.path.join(input_directory, 'REC_ORT.x10'))
@@ -63,6 +63,10 @@ def convert(converter_context, input_directory, output_directory):
             line_name = rec_lid_record['LIDNAME']
             route_nr = rec_lid_record['ROUTEN_NR']
             route_name = rec_lid_record['STR_LI_VAR']
+
+            # check for active line filter
+            if len(line_filter) > 0 and not line_nr in line_filter:
+                continue
 
             route_coordinates = list()
             route_intermediate_stops_meta = list()
