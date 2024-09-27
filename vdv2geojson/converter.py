@@ -90,6 +90,8 @@ class VdvGeoJsonConverter:
             'type': 'FeatureCollection',
             'features': self._geojson_linestring_features
         })
+
+        self._geojson_linestring_features = list()
     
     def _write_geojson_file(self, geojson_filename, geojson_data):
         self._geojson_files.append(geojson_filename)

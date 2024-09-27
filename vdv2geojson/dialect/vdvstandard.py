@@ -61,6 +61,8 @@ def convert(converter_context, input_directory, output_directory, line_filter):
         for rec_lid_record in x10_REC_LID.records:
             line_nr = rec_lid_record['LI_NR']
             line_name = rec_lid_record['LIDNAME']
+            line_direction = rec_lid_record['LI_RI_NR']
+            line_id = rec_lid_record['LinienID'] if 'LinienID' in rec_lid_record else ''
             route_nr = rec_lid_record['ROUTEN_NR']
             route_name = rec_lid_record['STR_LI_VAR']
 
@@ -71,7 +73,7 @@ def convert(converter_context, input_directory, output_directory, line_filter):
             route_coordinates = list()
             route_intermediate_stops_meta = list()
 
-            logging.info(f"found (LineNr-LineVariantName) {line_nr}-{route_name} - converting now ...")
+            logging.info(f"found (LineNr-LineDirection-LineVariantName) {line_nr}-{line_direction}-{route_name} - converting now ...")
 
             lid_verlauf_items = x10_LID_VERLAUF.find_records(rec_lid_record, ['LI_NR', 'STR_LI_VAR'])
             
@@ -79,17 +81,17 @@ def convert(converter_context, input_directory, output_directory, line_filter):
             last_stop_point_identifier = (lid_verlauf_items[0]['ONR_TYP_NR'], lid_verlauf_items[0]['ORT_NR'])
             last_stop_point = idx_point_data[last_stop_point_identifier]
 
-            shape_distance = 0.0
+            stop_dist_travelled = 0.0
 
             # add first stop to intermediate stop meta data
             intermediate_stop_id = lid_verlauf_items[0]['ORT_NR']
             if converter_context._config['config']['prefer_international_ids'] and not last_stop_point[1] == '':
                 intermediate_stop_id = last_stop_point[1]
 
-            route_intermediate_stops_meta.append((
-                intermediate_stop_id,
-                shape_distance
-            ))
+            route_intermediate_stops_meta.append({
+                'stop_id': intermediate_stop_id,
+                'shape_dist_traveled': stop_dist_travelled
+            })
 
             # run over remaining items
             for lid_verlauf_item in lid_verlauf_items[1:]:
@@ -100,6 +102,9 @@ def convert(converter_context, input_directory, output_directory, line_filter):
                 section = idx_section_data[last_stop_point_identifier + stop_point_identifier]
                 section_intermediate_points = idx_section_intermediate_data[last_stop_point_identifier + stop_point_identifier]
                 
+                # increase distance
+                stop_dist_travelled = stop_dist_travelled + section[0]
+
                 # select route section intermediate points
                 section_intermediate_point_coordinates = list()
                 for intermediate_point_reference in section_intermediate_points:
@@ -117,28 +122,29 @@ def convert(converter_context, input_directory, output_directory, line_filter):
                 if converter_context._config['config']['prefer_international_ids'] and not stop_point[1] == '':
                     intermediate_stop_id = stop_point[1]
 
-                route_intermediate_stops_meta.append((
-                    intermediate_stop_id,
-                    (shape_distance / 1000.0)
-                ))
+                route_intermediate_stops_meta.append({
+                    'stop_id': intermediate_stop_id,
+                    'shape_dist_traveled': (stop_dist_travelled / 1000.0)
+                })
 
                 # set last_stop_point in order to process next section
                 last_stop_point_identifier = stop_point_identifier
                 last_stop_point = stop_point
 
-                shape_distance = shape_distance + section[0]
-
             # add GeoJSON feature
             converter_context._add_linestring_feature(route_coordinates, {
                 'line_nr': line_nr,
                 'line_name': line_name,
+                'line_id': line_id,
+                'line_direction': line_direction,
                 'route_nr': route_nr,
                 'route_name': route_name,
                 'intermediate_stops': route_intermediate_stops_meta
             })
 
-        # write GeoJOSN file finally
-        converter_context._write_linestring_geojson_file(os.path.join(output_directory, 'Lines.geojson'))
+            # write GeoJOSN file finally
+            geojson_filename = f"{line_nr}-{line_direction}-{route_name}.geojson"
+            converter_context._write_linestring_geojson_file(os.path.join(output_directory, geojson_filename))
 
 def _convert_coordinate_vdv(input):
     input_string = str(input)
