@@ -226,6 +226,27 @@ class X10File:
                 updated_records.append(self.records[i])
                 
         self.records = updated_records 
+
+    def find_records(self, rdata, primary_key=None):
+        rdata = self._create_compare_record(rdata, primary_key)
+        
+        result_records = list()
+        for i in range(len(self.records)):
+            compare_record = self._create_compare_record(self.records[i], primary_key)
+
+            if rdata == compare_record:
+                result_records.append(self.records[i])
+
+        return result_records
+    
+    def find_record(self, rdata, primary_key=None):
+        rdata = self._create_compare_record(rdata, primary_key)
+        
+        for i in range(len(self.records)):
+            compare_record = self._create_compare_record(self.records[i], primary_key)
+
+            if rdata == compare_record:
+                return self.records[i]
             
     def replace_foreign_keys(self, foreign_key_columns, repl_map):
         for i in range(len(self.records)):
