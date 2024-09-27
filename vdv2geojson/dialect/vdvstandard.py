@@ -83,30 +83,6 @@ def convert(converter_context, input_directory, output_directory):
                 section_intermediate_points = idx_section_intermediate_data[last_stop_point_identifier + stop_point_identifier]
                 
                 # select route section intermediate points
-                """section_intermediate_point_coordinates = list()
-                if section_identifier in _section_intermediate_cache.keys():
-                    section_intermediate_point_coordinates = _section_intermediate_cache[section_identifier]
-                else:
-                    section_intermediate_point_items = x10_REC_SEL_ZP.find_records(section_selector, ['ORT_NR', 'SEL_ZIEL'])
-                    for intermediate_point_item in section_intermediate_point_items:
-                        intermediate_point_identifier = (intermediate_point_item['ZP_ONR'], intermediate_point_item['ZP_TYP'])
-                        if intermediate_point_identifier in _point_coordinate_cache.keys():
-                            section_intermediate_point_coordinates.append(_point_coordinate_cache[intermediate_point_identifier])
-                        else:
-                            intermediate_selector = {'ORT_NR': intermediate_point_item['ZP_ONR'], 'ONR_TYP_NR': intermediate_point_item['ZP_TYP']}
-                            intermediate_point = x10_REC_ORT.find_record(intermediate_selector, ['ORT_NR', 'ONR_TYP_NR'])
-
-                            intermediate_point_coordinates = _convert_coordinates_vdv(
-                                intermediate_point['ORT_POS_LAENGE'], 
-                                intermediate_point['ORT_POS_BREITE']
-                            )
-
-                            section_intermediate_point_coordinates.append(intermediate_point_coordinates) 
-
-                            _point_coordinate_cache[intermediate_point_identifier] = intermediate_point_coordinates
-
-                        _section_intermediate_cache[section_identifier] = section_intermediate_point_coordinates"""
-    
                 section_intermediate_point_coordinates = list()
                 for intermediate_point_reference in section_intermediate_points:
                     intermediate_point = idx_point_data[intermediate_point_reference]
