@@ -83,10 +83,15 @@ def convert(converter_context, input_directory, output_directory, line_filter):
 
             stop_dist_travelled = 0.0
 
-            # add first stop to intermediate stop meta data
+            # add first stop to all required datasets
             intermediate_stop_id = lid_verlauf_items[0]['ORT_NR']
             if converter_context._config['config']['prefer_international_ids'] and not last_stop_point[1] == '':
                 intermediate_stop_id = last_stop_point[1]
+
+            route_coordinates.append([
+                last_stop_point[2],
+                last_stop_point[3]
+            ])
 
             route_intermediate_stops_meta.append({
                 'stop_id': intermediate_stop_id,
@@ -100,21 +105,33 @@ def convert(converter_context, input_directory, output_directory, line_filter):
 
                 # select route section point
                 section = idx_section_data[last_stop_point_identifier + stop_point_identifier]
-                section_intermediate_points = idx_section_intermediate_data[last_stop_point_identifier + stop_point_identifier]
-                
+
+                if (last_stop_point_identifier + stop_point_identifier) in idx_section_intermediate_data.keys():
+                    section_intermediate_points = idx_section_intermediate_data[last_stop_point_identifier + stop_point_identifier]
+                else:
+                    section_intermediate_points = list()
+
                 # increase distance
                 stop_dist_travelled = stop_dist_travelled + section[0]
 
-                # select route section intermediate points
+                # if there were some intermediate points find
                 section_intermediate_point_coordinates = list()
-                for intermediate_point_reference in section_intermediate_points:
-                    intermediate_point = idx_point_data[intermediate_point_reference]
+                if len(section_intermediate_points) > 0:
+                    # select route section intermediate points
+                    for intermediate_point_reference in section_intermediate_points:
+                        intermediate_point = idx_point_data[intermediate_point_reference]
 
+                        section_intermediate_point_coordinates.append([
+                            intermediate_point[2],
+                            intermediate_point[3]
+                        ])
+                else:
+                    # if there was no intermediate point added, add the current stop point instead
                     section_intermediate_point_coordinates.append([
-                        intermediate_point[2],
-                        intermediate_point[3]
+                        stop_point[2],
+                        stop_point[3]
                     ])
-                
+
                 route_coordinates = route_coordinates + section_intermediate_point_coordinates
 
                 # generate meta data
