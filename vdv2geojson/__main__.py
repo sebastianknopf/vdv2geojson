@@ -1,5 +1,6 @@
 import click
 import logging
+import os
 
 from vdv2geojson.converter import VdvGeoJsonConverter
 
@@ -16,7 +17,12 @@ logging.basicConfig(
 @click.option('--config', default=None, help='additional config file')
 def main(input, output, lines, config):
     if not lines is None:
-        line_filter = lines.split(',')
+        if os.path.isfile(lines):
+            with open(lines, 'r') as lines_file:
+                line_filter = [x.strip() for x in lines_file]
+        else:
+            line_filter = lines.split(',')
+
         line_filter = [int(x.strip()) for x in line_filter]
     else:
         line_filter = []
