@@ -27,6 +27,7 @@ class VdvGeoJsonConverter:
 
             self._config['data'] = dict()
             self._config['data']['extract_shapes'] = True
+            self._config['data']['extract_shapes_intermediate_stops'] = True
 
         self._geojson_linestring_features = list()
         self._geojson_files = list()

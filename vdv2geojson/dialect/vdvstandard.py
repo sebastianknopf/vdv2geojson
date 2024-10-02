@@ -169,15 +169,19 @@ def convert(converter_context, input_directory, output_directory, line_filter):
                 last_stop_point = stop_point
 
             # add GeoJSON feature
-            converter_context._add_linestring_feature(route_coordinates, {
+            meta_data = dict({
                 'line_nr': line_nr,
                 'line_name': line_name,
                 'line_id': line_id,
                 'line_direction': line_direction,
                 'route_nr': route_nr,
                 'route_name': route_name,
-                'intermediate_stops': route_intermediate_stops_meta
             })
+
+            if converter_context._config['data']['extract_shapes_intermediate_stops']:
+                meta_data['intermediate_stops'] = route_intermediate_stops_meta
+
+            converter_context._add_linestring_feature(route_coordinates, meta_data)
 
             # write GeoJOSN file finally
             geojson_filename = f"{line_nr}-{line_direction}-{route_name}.geojson"
