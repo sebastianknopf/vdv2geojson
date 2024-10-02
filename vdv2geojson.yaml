@@ -1,0 +1,10 @@
+config:
+  prefer_international_ids: true
+  flatten_shapes: true
+  flatten_shapes_epsilon: 0.000005
+  x10:
+    null_value: "NULL"
+    encoding: ISO-8859-1
+data:
+  extract_shapes: true
+  extract_shapes_intermediate_stops: false
