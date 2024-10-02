@@ -1,13 +1,15 @@
 import csv
+import logging
 import re
 
 ########################################################################################################################
 # Helper class for reading and modifying *.x10 files.
 ########################################################################################################################
 
-def read_x10_file(filename, null_value='NULL'):
+def read_x10_file(filename, null_value='NULL', encoding='utf-8'):
     x10_file = X10File()
     x10_file.null_value = null_value
+    x10_file.encoding = encoding
     x10_file.read(filename)
     
     return x10_file
@@ -22,6 +24,7 @@ class X10File:
 
     def __init__(self, filename=None):
         self.null_value = ''
+        self.encoding = 'utf-8'
         self.strict = False
         
         self._internal_init()
@@ -29,7 +32,7 @@ class X10File:
     def read(self, filename):
         self._filename = filename
     
-        with open(self._filename, newline='') as x10_file:
+        with open(self._filename, newline='', encoding=self.encoding) as x10_file:
             x10_reader = csv.reader(x10_file, delimiter=';', quotechar='"')
             for x10_row in x10_reader:
                 if len(x10_row) > 0:
@@ -102,7 +105,7 @@ class X10File:
                         
                     elif x10_row[0] == 'end':
                         if not len(self.records) == int(x10_row[1]):
-                            console.error("number of records not matching")
+                            logging.error("number of records not matching")
                             
                     elif x10_row[0] == 'eof':
                         pass
@@ -111,7 +114,7 @@ class X10File:
         if filename == None:
             filename = self._filename
     
-        with open(filename, 'w', newline='') as x10_file:
+        with open(filename, 'w', newline='', encoding=self.encoding) as x10_file:
             x10_writer = csv.writer(x10_file, delimiter=';', quotechar='*')
             
             x10_writer.writerow([

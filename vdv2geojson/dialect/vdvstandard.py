@@ -6,7 +6,11 @@ from vdv2geojson.x10 import read_x10_file
 def convert(converter_context, input_directory, output_directory, line_filter):
     # load general data
     logging.info('loading REC_ORT.x10 ...')
-    x10_REC_ORT = read_x10_file(os.path.join(input_directory, 'REC_ORT.x10'))
+    x10_REC_ORT = read_x10_file(
+        os.path.join(input_directory, 'REC_ORT.x10'), 
+        converter_context._config['config']['x10']['null_value'], 
+        converter_context._config['config']['x10']['encoding']
+    )
 
     logging.info('indexing point data ...')
     idx_point_data = dict()
@@ -25,7 +29,11 @@ def convert(converter_context, input_directory, output_directory, line_filter):
     if converter_context._config['data']['extract_shapes']:
         # generate network index ...
         logging.info('loading REC_SEL_ZP.x10 ...')
-        x10_REC_SEL_ZP = read_x10_file(os.path.join(input_directory, 'REC_SEL_ZP.x10'))
+        x10_REC_SEL_ZP = read_x10_file(
+            os.path.join(input_directory, 'REC_SEL_ZP.x10'),
+            converter_context._config['config']['x10']['null_value'], 
+            converter_context._config['config']['x10']['encoding']
+        )
 
         logging.info('indexing section intermediate points ...')
         idx_section_intermediate_data = dict()
@@ -39,7 +47,11 @@ def convert(converter_context, input_directory, output_directory, line_filter):
         x10_REC_SEL_ZP.close()
 
         logging.info('loading REC_SEL.x10 ...')
-        x10_REC_SEL = read_x10_file(os.path.join(input_directory, 'REC_SEL.x10'))
+        x10_REC_SEL = read_x10_file(
+            os.path.join(input_directory, 'REC_SEL.x10'),
+            converter_context._config['config']['x10']['null_value'], 
+            converter_context._config['config']['x10']['encoding']
+        )
 
         logging.info('indexing sections ...')
         idx_section_data = dict()
@@ -52,10 +64,18 @@ def convert(converter_context, input_directory, output_directory, line_filter):
         x10_REC_SEL.close()
 
         logging.info('loading REC_LID.x10 ...')
-        x10_REC_LID = read_x10_file(os.path.join(input_directory, 'REC_LID.x10'))
+        x10_REC_LID = read_x10_file(
+            os.path.join(input_directory, 'REC_LID.x10'),
+            converter_context._config['config']['x10']['null_value'], 
+            converter_context._config['config']['x10']['encoding']
+        )
 
         logging.info('loading LID_VERLAUF.x10 ...')
-        x10_LID_VERLAUF = read_x10_file(os.path.join(input_directory, 'LID_VERLAUF.x10'))
+        x10_LID_VERLAUF = read_x10_file(
+            os.path.join(input_directory, 'LID_VERLAUF.x10'),
+            converter_context._config['config']['x10']['null_value'], 
+            converter_context._config['config']['x10']['encoding']
+        )
 
         # run over each line ...
         for rec_lid_record in x10_REC_LID.records:

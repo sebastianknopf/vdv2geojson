@@ -21,6 +21,10 @@ class VdvGeoJsonConverter:
             self._config['config']['flatten_shapes'] = True
             self._config['config']['flatten_shapes_epsilon'] = 0.000005
 
+            self._config['config']['x10'] = dict()
+            self._config['config']['x10']['null_value'] = 'NULL'
+            self._config['config']['x10']['encoding'] = 'utf-8'
+
             self._config['data'] = dict()
             self._config['data']['extract_shapes'] = True
 
